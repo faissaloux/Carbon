@@ -446,16 +446,37 @@ class CarbonPeriod extends DatePeriodBase implements Countable, JsonSerializable
      */
     protected static function isIso8601(mixed $var): bool
     {
+        // Must be a string
         if (!\is_string($var)) {
             return false;
         }
 
-        // Match slash but not within a timezone name.
-        $part = '[a-z]+(?:[_-][a-z]+)*';
+        $chunks = explode('/', $var, 2);
 
-        preg_match("#\b$part/$part\b|(/)#i", $var, $match);
+        // And contain a slash
+        if (\count($chunks) === 1) {
+            return false;
+        }
 
-        return isset($match[1]);
+        // But must not be a timezone (the word before the slash must not be a continent)
+        return !\in_array(strtolower(preg_replace('/^.*\s(\S+)$/', '$1', $chunks[0])), [
+            'africa',
+            'america',
+            'antarctica',
+            'arctic',
+            'asia',
+            'atlantic',
+            'australia',
+            'europe',
+            'indian',
+            'pacific',
+            'brazil',
+            'canada',
+            'chile',
+            'etc',
+            'mexico',
+            'us',
+        ]);
     }
 
     /**
@@ -691,10 +712,6 @@ class CarbonPeriod extends DatePeriodBase implements Countable, JsonSerializable
                 $sortedArguments['interval'] ?? CarbonInterval::day(),
                 $end,
             ];
-        }
-
-        if ($raw === null && \is_string($arguments[0] ?? null) && substr_count($arguments[0], '/') >= 1) {
-            $raw = [$arguments[0]];
         }
 
         $constructed = false;
@@ -2269,6 +2286,30 @@ class CarbonPeriod extends DatePeriodBase implements Countable, JsonSerializable
         unset($info['start'], $info['end'], $info['interval'], $info['include_start_date'], $info['include_end_date']);
 
         return $info;
+    }
+
+    public function __unserialize(array $data): void
+    {
+        $filteredData = [];
+
+        foreach ($data as $key => $value) {
+            if (str_contains($key, 'current') || str_contains($key, 'recurrences')) {
+                continue;
+            }
+
+            $filteredData[$key] = $value;
+        }
+
+        if (method_exists(parent::class, '__unserialize')) {
+            // PHP >= 8.2
+            parent::__unserialize($filteredData);
+
+            return;
+        }
+
+        // PHP <= 8.1
+        // @codeCoverageIgnoreStart
+        // @codeCoverageIgnoreEnd
     }
 
     /**

@@ -908,5 +908,4 @@ class CreateTest extends AbstractTestCase
         $this->assertSame('29/04 Africa/Tunis', $period->start->format('d/m e'));
         $this->assertSame('Every 1 day from 2024-04-29', (string) $period);
     }
-
 }
