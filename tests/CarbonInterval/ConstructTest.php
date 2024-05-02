@@ -432,8 +432,8 @@ class ConstructTest extends AbstractTestCase
 
     public function testFromSerialization()
     {
-        $past = new Carbon('-3 Days');
-        $today = new Carbon('today');
+        $past = Carbon::parse('2024-05-01 00:00');
+        $today = Carbon::parse('2024-05-03 12:34:56.789');
         $interval = $today->diffAsCarbonInterval($past);
         /** @var CarbonInterval $copy */
         $copy =  unserialize(serialize($interval));

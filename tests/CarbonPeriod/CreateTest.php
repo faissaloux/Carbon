@@ -898,4 +898,15 @@ class CreateTest extends AbstractTestCase
             $period->end?->format('Y-m-d'),
         ]);
     }
+
+    public function testCreateFromSlashString()
+    {
+        Carbon::setTestNowAndTimezone('2024-04-26', 'UTC');
+        $period = new CarbonPeriod('Monday/2hours/Tuesday');
+        $this->assertSame('Every 2 hours from 2024-04-29 to 2024-04-30', (string) $period);
+        $period = new CarbonPeriod('Monday Africa/Tunis');
+        $this->assertSame('29/04 Africa/Tunis', $period->start->format('d/m e'));
+        $this->assertSame('Every 1 day from 2024-04-29', (string) $period);
+    }
+
 }

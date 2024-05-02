@@ -94,15 +94,15 @@ class TranslatorTest extends AbstractTestCase
 
         $this->assertEquals('de', unserialize(serialize($translator))->getLocale());
 
-        $past = new Carbon('-3 Days');
-        $today = new Carbon('today');
+        $past = Carbon::parse('2024-05-01 00:00');
+        $today = Carbon::parse('2024-05-03 12:34:56.789');
         $interval = $today->diffAsCarbonInterval($past);
         $translator = $interval->getLocalTranslator();
 
         $this->assertEquals('en', unserialize(serialize($translator))->getLocale());
 
-        $past = new Carbon('-3 Days');
-        $today = new Carbon('today');
+        $past = Carbon::parse('2024-05-01 00:00');
+        $today = Carbon::parse('2024-05-03 12:34:56.789');
         $interval = $today->locale('zh')->diffAsCarbonInterval($past);
         $translator = $interval->getLocalTranslator();
 

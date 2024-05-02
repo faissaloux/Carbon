@@ -2172,8 +2172,8 @@ class DiffTest extends AbstractTestCase
 
     public function testAFormat()
     {
-        $past = new Carbon('-3 Days');
-        $today = new Carbon('today');
+        $past = Carbon::parse('2024-05-01 00:00');
+        $today = Carbon::parse('2024-05-03 12:34:56.789');
         $interval = $today->diff($past);
 
         $this->assertSame('2', $interval->format('%a'));

@@ -136,7 +136,7 @@ trait Test
         return $timezone ? $testNow->setTimezone($timezone) : $testNow;
     }
 
-    private function mockConstructorParameters(&$time, ?CarbonTimeZone $timezone): void
+    private function mockConstructorParameters(&$time, ?CarbonTimeZone &$timezone): void
     {
         $clock = $this->clock?->unwrap();
         $now = $clock instanceof Factory
@@ -149,7 +149,15 @@ trait Test
         }
 
         if ($testInstance instanceof DateTimeInterface) {
-            $testInstance = $testInstance->setTimezone($timezone ?? date_default_timezone_get());
+            $timezone ??= new CarbonTimeZone(date_default_timezone_get());
+            $tester = $time === null ? null : new DateTimeImmutable($time);
+            $testerTimezone = $tester?->getTimezone()?->getName();
+
+            if ($testerTimezone && $timezone->getName() !== $testerTimezone) {
+                $timezone = new CarbonTimeZone($testerTimezone);
+            }
+
+            $testInstance = $testInstance->setTimezone($timezone);
         }
 
         if (static::hasRelativeKeywords($time)) {
